@@ -14,7 +14,9 @@
 
 We have **23 of the 45 villas**. Each villa has **3 rooms**, so we have **69 rooms** in total.
 
-Open **`index.html`** in any browser. There's nothing to install. Everything is saved in that browser automatically. Use *Guest list → Backup (JSON)* to share it with someone else or move it to another device.
+**Shared live version:** https://claude.ai/artifact/KpSiQrPFLNeoivJpFF4j3H. Everyone it's shared with sees the same plan, and changes appear for everyone straight away. Family members with *Contributor* access or above can edit. *Viewers* see it read-only.
+
+You can also open **`index.html`** straight from this repo in any browser. There's nothing to install. Opened that way, the plan is saved only in that browser. Use *Guest list → Save backup* and *Restore backup* to move it between devices.
 
 ![Site map](docs/preview-map.png)
 
@@ -59,9 +61,9 @@ The villas are grouped into four suggested **lanes** around **the Chowk** (the l
    - Drag a **family header** to move the whole family. It fills that room, then spills into the villa's other free rooms.
    - Drag a **single name** to move one person.
    - On a phone, **tap** a name or family, then **tap a room**.
-   - **✦ Suggest allotment** places everyone who is left, following the rules below. After that, you adjust by hand.
+   - **Suggest rooms** places everyone who is left, following the rules below. After that, you adjust by hand. Bulk actions can be undone.
 3. **Guest list**: an editable table for name, family, group, elder or kid, the nights they stay, phone and room. It also has CSV import and export, plus backup and restore.
-4. **Print**: a welcome card for each villa's door, plus an A–Z "who is where" sheet for the help desk.
+4. **Door cards**: a card for each villa's door, plus an A–Z "who is where" sheet for the help desk. Use *Save printable page* to download them, then print.
 
 ### Rules the planner follows and checks
 
@@ -96,7 +98,7 @@ Fill in [`data/guest-list-template.csv`](data/guest-list-template.csv) (Excel or
 | `phone` | | optional |
 | `room_id` | `V03-A` | optional, if you already know the room |
 
-Then go to *Import guest list → Allot rooms → ✦ Suggest allotment* and adjust by hand.
+Then go to *Import guest list → Allot rooms → Suggest rooms* and adjust by hand.
 
 ### To confirm with Ambli ni Pol
 
