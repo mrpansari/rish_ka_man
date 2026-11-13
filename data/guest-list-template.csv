@@ -1,7 +1,5 @@
-name,household,group,elder,kid,nights,phone,room_id
-Dadaji,Dada–Dadi,Ghar,yes,,27 28 1,,
-Dadiji,Dada–Dadi,Ghar,yes,,27 28 1,,
-Bade Mama,Bade Mama (Mayra),Nanihal,,,28 1,,
-Badi Mami,Bade Mama (Mayra),Nanihal,,,28 1,,
-Cousin (8),Chhote Mama,Nanihal,,yes,28 1,,
-College friend 1,College gang,Yaar-dost,,,27 28 1,,
+name,family,group,relation,adults,kids,from,stay,rooms_needed,nights,phone,note
+Vinod Pansari,Pansari,Bhai-bandhu,Bhai,4,2,Jaipur,villa,2,28 1,,
+Pankaj Mamaji,,Mama paksh,Mama,2,2,Bhopal,villa,1,28 1,,
+Rinki Didi,,Behn-Beti,Behn/beti,2,0,Jaipur,villa,0,28 1,,Shares with Pinki Didi
+Ravi Bajaj,Bajaj,Friends,Friend,2,0,Surat,home,0,,,

@@ -83,22 +83,21 @@ The villas are grouped into four suggested **lanes** around **the Chowk** (the l
   - **extra mattresses to request from the venue**
   - **headcount per night**, which the caterer also needs for breakfast counts
 
-### Importing the real guest list
+### Guests are families, with headcounts
 
-Fill in [`data/guest-list-template.csv`](data/guest-list-template.csv) (Excel or Google Sheets → *Download as CSV*):
+Each entry is one family (a party) with an **adult and kid counter**, the city it's **coming from**, where it **stays** (villa room, hotel, or own arrangement), and how many **rooms it needs**. Set rooms to 0 when a family shares a room with others ("adjust"). A family that needs 2 rooms is split evenly across them when the planner checks beds.
 
-| Column | Example | Notes |
-|---|---|---|
-| `name` | Dadiji | required |
-| `household` | Dada–Dadi | people with the same household are kept together |
-| `group` | Ghar / Dadihal / Nanihal / Rishtedar / Family friends / Yaar-dost / Crew | |
-| `elder` | yes | needs a ground floor |
-| `kid` | yes | counts as half a bed |
-| `nights` | `27 28 1` | nights sleeping at the venue. Blank means 28 & 1. |
-| `phone` | | optional |
-| `room_id` | `V03-A` | optional, if you already know the room |
+Each villa has **Rooms A, B, C and a Hall**. Every room and hall has a beds count (2 for rooms, 0 for halls) and an **extra mattress counter**. "Sleeps" = beds + mattresses. The planner checks every room night by night, and tells you how many more mattresses a room needs.
 
-Then go to *Import guest list → Allot rooms → Suggest rooms* and adjust by hand.
+The Guest list filters by **side, family, city and stay**. City chips at the top show how many families and people come from each place, which also helps with planning pickups.
+
+### Importing the guest sheet
+
+*Guest list → Import sheet* takes the family Excel sheet as it is (`.xlsx`): **Family Name, Relation, Count bade, Count Chote, Coming from, Room dena, Room Count, Must Have, Mama Paksh, Behen Betiya, Close relatives**. It also takes a CSV in this planner's own format; see [`data/guest-list-template.csv`](data/guest-list-template.csv).
+
+- **Side:** Bhai becomes Bhai-bandhu, Behn/beti and Bhatiji become Behn-Beti, Mama becomes Mama paksh, Relative becomes Relatives, Friend becomes Friends, and Pandit becomes Pandit & crew. Blank relations use the sheet's tick columns.
+- **Family:** shared surnames become families (Pansari, Goyal, Agarwal, Gudawala, Rajlaxmi…).
+- **Stay:** Room dena = 1 means a villa room, and blank means own arrangement. A Room Count of "Adjust" means the family shares.
 
 ### To confirm with Ambli ni Pol
 
