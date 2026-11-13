@@ -1,0 +1,839 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Villa Allotment</title>
+<meta name="description" content="Room allotment planner for Rishika & Daaman's wedding at Ambli ni Pol, Surat — 23 villas, 69 rooms.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&display=swap" rel="stylesheet">
+<style>
+:root{
+  color-scheme: light;
+  --paper:#FBF6EC; --paper-2:#F3E9D6; --paper-3:#EADBC0;
+  --ink:#2A1A14; --ink-2:#6B5348; --ink-3:#9A8578;
+  --line:#E5D5BC; --card:#FFFDF8;
+  --maroon:#7A1631; --marigold:#E9A21A; --genda:#E4572E;
+  --ok:#2E7D4F; --warn:#B86E00; --bad:#B3261E;
+  --radius:14px;
+  --shadow:0 1px 2px rgba(60,30,10,.06),0 8px 22px rgba(60,30,10,.07);
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--paper);color:var(--ink);font:15px/1.45 'DM Sans',system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+h1,h2,h3,.serif{font-family:'Cormorant Garamond',Georgia,serif;font-weight:700;letter-spacing:.2px;font-variant-numeric:lining-nums}
+button,input,select{font:inherit;color:inherit}
+button{cursor:pointer}
+.garland{height:12px;background:
+  radial-gradient(circle at 6px 6px,#F2A007 5px,transparent 5.5px) 0 0/24px 12px,
+  radial-gradient(circle at 6px 6px,var(--genda) 5px,transparent 5.5px) 12px 0/24px 12px,
+  var(--maroon)}
+.top{display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;padding:18px 24px 14px;border-bottom:1px solid var(--line)}
+.brand{display:flex;gap:14px;align-items:center}
+.mono{flex:none;white-space:nowrap;width:54px;height:54px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:var(--maroon);color:#FBE7B5;font:700 20px 'Cormorant Garamond',serif;box-shadow:inset 0 0 0 3px var(--maroon),inset 0 0 0 4.5px #E9C27A}
+.mono span{font-size:15px;margin:0 1px;color:#F2C35B}
+.brand h1{margin:0;font-size:30px;line-height:1;color:var(--maroon)}
+.brand p{margin:4px 0 0;color:var(--ink-2);font-size:13.5px}
+.tabs{display:flex;gap:4px;background:var(--paper-2);padding:4px;border-radius:999px}
+.tabs button{border:0;background:transparent;padding:8px 16px;border-radius:999px;font-weight:600;color:var(--ink-2)}
+.tabs button[aria-selected=true]{background:var(--card);color:var(--maroon);box-shadow:var(--shadow)}
+.wrap{padding:16px 24px 40px;max-width:1500px;margin:0 auto}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin-bottom:14px}
+.stat{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:10px 14px}
+.stat b{display:block;font:700 22px/1.15 'DM Sans',sans-serif;font-variant-numeric:tabular-nums;color:var(--ink)}
+.stat small{color:var(--ink-2);font-size:12.5px}
+.stat.click{cursor:pointer}
+.stat.alert b{color:var(--bad)}
+.nightsbar{display:flex;gap:10px}
+.nightsbar div{flex:1}
+.nightsbar b{font-size:19px}
+.banner{display:flex;gap:12px;align-items:center;justify-content:space-between;flex-wrap:wrap;background:#FFF4D6;border:1px solid #F0D68E;border-radius:12px;padding:10px 14px;margin-bottom:14px;font-size:14px}
+.btn{border:1px solid var(--line);background:var(--card);padding:7px 13px;border-radius:9px;font-weight:600;font-size:13.5px}
+.btn:hover{border-color:var(--ink-3)}
+.btn.primary{background:var(--maroon);border-color:var(--maroon);color:#FFF4E0}
+.btn.ghost{background:transparent}
+.btn.small{padding:4px 9px;font-size:12.5px}
+.row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.muted{color:var(--ink-2)}
+.legend{display:flex;flex-wrap:wrap;gap:6px 14px;margin:4px 0 14px;font-size:13px}
+.legend span{display:inline-flex;align-items:center;gap:6px}
+.dot{width:11px;height:11px;border-radius:3px;display:inline-block;flex:none}
+
+/* ---------- Events strip ---------- */
+.events{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:16px}
+.ev{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:10px 14px;position:relative;overflow:hidden}
+.ev:before{content:"";position:absolute;inset:0 auto 0 0;width:4px;background:var(--marigold)}
+.ev h3{margin:0;font-size:19px;color:var(--maroon)}
+.ev p{margin:2px 0 0;font-size:13.5px;color:var(--ink-2)}
+
+/* ---------- Site map ---------- */
+.site{display:grid;grid-template-columns:1fr minmax(240px,.72fr) 1fr;grid-template-areas:"z1 z1 z1" "z2 chowk z3" "z4 z4 z4";gap:14px}
+.zone{background:linear-gradient(180deg,var(--paper-2),var(--paper));border:1px solid var(--line);border-radius:18px;padding:12px 12px 14px;position:relative}
+.zone .sign{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;margin:0 4px 8px}
+.zone .sign h2{margin:0;font-size:22px;color:var(--maroon)}
+.zone .sign small{color:var(--ink-2);font-size:12.5px}
+.zone .lane{display:grid;gap:10px;grid-template-columns:repeat(auto-fill,minmax(118px,1fr))}
+.zone[data-z=z2] .lane,.zone[data-z=z3] .lane{grid-template-columns:repeat(2,1fr)}
+.villa{background:transparent;border:1px solid transparent;border-radius:12px;padding:6px 4px 8px;text-align:center;transition:background .15s,border-color .15s;position:relative}
+.villa:hover,.villa:focus-visible{background:var(--card);border-color:var(--line);outline:none}
+.villa.active{background:var(--card);border-color:var(--maroon)}
+.villa svg{width:100%;max-width:132px;height:auto;display:block;margin:0 auto}
+.villa .vl{font-weight:700;font-size:13.5px;margin-top:2px}
+.villa .vm{font-size:12px;color:var(--ink-2);min-height:16px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.villa .flag{position:absolute;top:6px;right:8px;width:9px;height:9px;border-radius:50%;background:var(--bad);box-shadow:0 0 0 2px var(--paper)}
+.villa .flag.warn{background:var(--warn)}
+.chowk{grid-area:chowk;border-radius:18px;padding:16px;text-align:center;display:flex;flex-direction:column;justify-content:center;align-items:center;gap:6px;
+  background:radial-gradient(circle at 50% 40%,#E8F0D6 0,#D9E6BE 55%,#CFDDAF 100%);border:1px solid #C3D29E}
+.chowk h2{margin:0;font-size:24px;color:#3D5214}
+.chowk p{margin:0;font-size:13px;color:#4F6420}
+.chowk svg{width:150px;height:auto}
+.note{font-size:12.5px;color:var(--ink-3);margin-top:12px}
+
+/* ---------- Board ---------- */
+.board{display:grid;grid-template-columns:330px 1fr;gap:16px;align-items:start}
+.side{position:sticky;top:12px;max-height:calc(100vh - 24px);display:flex;flex-direction:column;background:var(--card);border:1px solid var(--line);border-radius:var(--radius);overflow:hidden}
+.side header{padding:12px 14px;border-bottom:1px solid var(--line);display:flex;flex-direction:column;gap:8px}
+.side header h2{margin:0;font-size:22px}
+.side .list{overflow:auto;padding:10px;display:flex;flex-direction:column;gap:8px;min-height:120px}
+.side .list.over{background:#FFF4D6}
+.field{border:1px solid var(--line);background:#fff;border-radius:9px;padding:7px 10px;width:100%}
+.hh{border:1px solid var(--line);border-radius:11px;padding:8px 9px;background:var(--paper);border-left:4px solid var(--c)}
+.hh .hhh{display:flex;justify-content:space-between;align-items:center;gap:6px;cursor:grab;font-weight:700;font-size:13.5px}
+.hh .hhh small{font-weight:500;color:var(--ink-2)}
+.hh.sel{outline:2px solid var(--maroon);outline-offset:1px}
+.chips{display:flex;flex-wrap:wrap;gap:5px;margin-top:6px}
+.chip{display:inline-flex;align-items:center;gap:5px;background:#fff;border:1px solid var(--line);border-radius:999px;padding:2px 9px 2px 6px;font-size:12.5px;cursor:grab;user-select:none;line-height:1.5}
+.chip .dot{width:8px;height:8px;border-radius:50%}
+.chip.sel{background:var(--maroon);color:#fff;border-color:var(--maroon)}
+.chip .tag{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:var(--ink-2);background:var(--paper-2);border-radius:4px;padding:0 4px}
+.chip.sel .tag{background:rgba(255,255,255,.2);color:#fff}
+.chip .x{border:0;background:transparent;padding:0 0 0 2px;font-size:14px;line-height:1;color:var(--ink-3)}
+.chip.sel .x{color:#fff}
+.mainb h2.zh{font-size:22px;margin:18px 0 8px;color:var(--maroon)}
+.mainb h2.zh:first-child{margin-top:0}
+.mainb h2.zh small{font:500 13px 'DM Sans',sans-serif;color:var(--ink-2);margin-left:8px}
+.vgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:12px}
+.vcard{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);overflow:hidden}
+.vcard>header{display:flex;justify-content:space-between;align-items:center;padding:8px 12px;background:var(--paper-2);border-bottom:1px solid var(--line)}
+.vcard>header b{font-size:14.5px}
+.vcard>header small{color:var(--ink-2);font-size:12px}
+.slot{padding:8px 12px;border-top:1px dashed var(--line);min-height:54px;transition:background .12s}
+.slot:first-of-type{border-top:0}
+.slot.over,.placing .slot:not(.reserved):hover{background:#FFF4D6}
+.placing .slot:not(.reserved){cursor:copy}
+.slot .sh{display:flex;justify-content:space-between;align-items:center;font-size:12.5px;color:var(--ink-2);font-weight:600}
+.slot.reserved{background:repeating-linear-gradient(135deg,var(--paper) 0 8px,var(--paper-2) 8px 16px)}
+.badge{font-size:10.5px;font-weight:700;border-radius:5px;padding:1px 5px;background:#E7F0E2;color:#3B6B2A;margin-left:6px;letter-spacing:.3px}
+.pips{display:inline-flex;gap:3px;align-items:center}
+.pip{width:22px;height:14px;border-radius:4px;font-size:9.5px;line-height:14px;text-align:center;font-weight:700;background:var(--paper-2);color:var(--ink-3)}
+.pip.ok{background:#DCEFE2;color:#245F3C}
+.pip.mat{background:#FBE3B7;color:#7A4A00}
+.pip.bad{background:#F6D0CC;color:#8C1D16}
+.placingbar{position:sticky;top:0;z-index:5;background:var(--maroon);color:#FFF4E0;border-radius:10px;padding:8px 12px;margin-bottom:10px;display:flex;justify-content:space-between;align-items:center;gap:10px;font-size:14px}
+
+/* ---------- Guests table ---------- */
+.tablewrap{overflow-x:auto;background:var(--card);border:1px solid var(--line);border-radius:var(--radius)}
+table{border-collapse:collapse;width:100%;font-size:13.5px}
+th,td{padding:6px 8px;border-bottom:1px solid var(--line);text-align:left;vertical-align:middle;white-space:nowrap}
+th{background:var(--paper-2);font-size:12px;text-transform:uppercase;letter-spacing:.5px;color:var(--ink-2);position:sticky;top:0}
+td input[type=text],td select{border:1px solid transparent;background:transparent;border-radius:6px;padding:4px 6px;min-width:90px}
+td input[type=text]:hover,td select:hover,td input[type=text]:focus,td select:focus{border-color:var(--line);background:#fff;outline:none}
+td.c{text-align:center}
+.toolbar{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-bottom:12px;align-items:center}
+
+/* ---------- Drawer ---------- */
+.drawer{position:fixed;top:0;right:0;height:100%;width:400px;max-width:100%;background:var(--card);border-left:1px solid var(--line);box-shadow:-10px 0 30px rgba(60,30,10,.12);transform:translateX(105%);transition:transform .22s ease;z-index:20;overflow:auto;padding:18px}
+.drawer.open{transform:none}
+.drawer h2{margin:0;font-size:28px;color:var(--maroon)}
+.drawer label.f{display:block;font-size:12px;color:var(--ink-2);font-weight:600;margin-top:10px}
+.drawer label.f input{margin-top:3px}
+.rb{border:1px solid var(--line);border-radius:12px;padding:10px 12px;margin-top:12px;background:var(--paper)}
+.rb .rh{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.rb .rh b{font-size:15px}
+.occ{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:5px 0;border-bottom:1px dashed var(--line);font-size:13.5px}
+.occ:last-child{border-bottom:0}
+.close{float:right;border:0;background:transparent;font-size:26px;line-height:1;color:var(--ink-2)}
+
+/* ---------- Warnings ---------- */
+.warns{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:6px 14px;margin-bottom:14px;max-height:260px;overflow:auto}
+.warns div{padding:5px 0;border-bottom:1px solid var(--paper-2);font-size:13.5px;display:flex;gap:8px;align-items:baseline;cursor:pointer}
+.warns div:last-child{border-bottom:0}
+.lvl{font-size:10.5px;font-weight:700;border-radius:4px;padding:1px 6px;text-transform:uppercase;flex:none}
+.lvl.bad{background:#F6D0CC;color:#8C1D16}.lvl.warn{background:#FBE3B7;color:#7A4A00}.lvl.info{background:#E2E8F4;color:#2D3F6B}
+
+/* ---------- Print ---------- */
+.cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:14px}
+.door{background:#FFFDF6;border:2px solid var(--maroon);border-radius:16px;padding:18px 20px;position:relative;box-shadow:inset 0 0 0 5px #FFFDF6,inset 0 0 0 6px #E9C27A;break-inside:avoid}
+.door .kicker{font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--ink-2);text-align:center}
+.door h3{margin:2px 0 0;font-size:34px;text-align:center;color:var(--maroon)}
+.door .zn{text-align:center;font-size:13px;color:var(--ink-2);margin-bottom:10px}
+.door .rm{border-top:1px solid var(--line);padding:7px 0;font-size:14px}
+.door .rm b{display:block;font-size:11.5px;text-transform:uppercase;letter-spacing:1px;color:var(--ink-2)}
+.door .foot{text-align:center;font:600 16px 'Cormorant Garamond',serif;color:var(--maroon);margin-top:8px}
+.master{columns:2;column-gap:28px;font-size:13.5px;background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:14px 18px}
+.master div{break-inside:avoid;display:flex;justify-content:space-between;gap:10px;border-bottom:1px dotted var(--line);padding:3px 0}
+
+.toast{position:fixed;left:50%;bottom:22px;transform:translate(-50%,30px);opacity:0;background:var(--ink);color:#fff;padding:9px 16px;border-radius:10px;font-size:14px;transition:.2s;z-index:40;pointer-events:none}
+.toast.show{opacity:1;transform:translate(-50%,0)}
+
+@media (max-width:980px){
+  .site{grid-template-columns:1fr;grid-template-areas:"chowk" "z1" "z2" "z3" "z4"}
+  .zone[data-z=z2] .lane,.zone[data-z=z3] .lane{grid-template-columns:repeat(auto-fill,minmax(118px,1fr))}
+  .board{grid-template-columns:1fr}
+  .side{position:static;max-height:420px}
+  .events{grid-template-columns:1fr}
+  .master{columns:1}
+}
+@media (max-width:600px){
+  .wrap{padding:12px 16px 40px}.top{padding:14px 16px 10px}
+  .brand h1{font-size:25px}
+  .tabs{width:100%;justify-content:space-between}.tabs button{padding:7px 6px;flex:1;font-size:13px;white-space:nowrap}
+}
+@media print{
+  body{background:#fff}
+  .noprint,.top,.garland,.stats,.banner,.drawer,.toast{display:none!important}
+  .wrap{padding:0;max-width:none}
+  .cards{grid-template-columns:1fr 1fr}
+  .door{box-shadow:none}
+  .pagebreak{break-before:page}
+}
+</style>
+</head>
+<body>
+<div class="garland"></div>
+<header class="top">
+  <div class="brand">
+    <div class="mono" aria-hidden="true">R<span>&amp;</span>D</div>
+    <div>
+      <h1>Villa Allotment</h1>
+      <p>Rishika &amp; Daaman · Ambli ni Pol, Surat · 28 Feb – 2 Mar 2027 · Groom's side: 23 villas, 69 rooms</p>
+    </div>
+  </div>
+  <nav class="tabs" role="tablist">
+    <button data-tab="map" role="tab">Site map</button>
+    <button data-tab="board" role="tab">Allot rooms</button>
+    <button data-tab="guests" role="tab">Guest list</button>
+    <button data-tab="print" role="tab">Print</button>
+  </nav>
+</header>
+<div class="wrap">
+  <div id="banner"></div>
+  <section id="stats" class="stats"></section>
+  <div id="warns"></div>
+  <main id="view"></main>
+</div>
+<aside id="drawer" class="drawer" aria-label="Villa details"></aside>
+<div id="toast" class="toast" role="status"></div>
+<input type="file" id="fileCsv" accept=".csv,text/csv" hidden>
+<input type="file" id="fileJson" accept=".json,application/json" hidden>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <pattern id="hatch" width="6" height="6" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
+      <rect width="6" height="6" fill="#EADBC0"/><line x1="0" y1="0" x2="0" y2="6" stroke="#B9A07C" stroke-width="2.4"/>
+    </pattern>
+  </defs>
+</svg>
+
+<script>
+/* =====================================================================
+   CONFIG — edit these to match the real venue & your families
+   ===================================================================== */
+const NIGHTS = [
+  {k:'27F', label:'27 Feb', short:'27', sub:'Early arrivals'},
+  {k:'28F', label:'28 Feb', short:'28', sub:'Haldi · Tilak · Sangeet'},
+  {k:'1M',  label:'1 Mar',  short:'1',  sub:'Mayra · Reception · Phere'},
+];
+const EVENTS = [
+  {day:'Sun, 28 Feb', items:'Haldi · Tilak · Sangeet'},
+  {day:'Mon, 1 Mar',  items:'Mayra · Reception · Phere (late night)'},
+  {day:'Tue, 2 Mar',  items:'Vidai (early morning) · Check-out'},
+];
+const GROUPS = [
+  {id:'ghar',     name:'Ghar',           desc:"Groom's immediate family",        color:'#7A1631', zones:['z1']},
+  {id:'dadihal',  name:'Dadihal',        desc:'Paternal side: Tau, Chacha, Bua', color:'#C27C0E', zones:['z2','z1','z3']},
+  {id:'nanihal',  name:'Nanihal',        desc:'Maternal side: Mama, Mausi (Mayra)', color:'#C8336E', zones:['z3','z1','z2']},
+  {id:'rishtedar',name:'Rishtedar',      desc:'Extended relatives',              color:'#0F6E6E', zones:['z2','z3','z4']},
+  {id:'mitra',    name:'Family friends', desc:"Parents' friends & neighbours",   color:'#5C7F1F', zones:['z3','z2','z1']},
+  {id:'yaar',     name:'Yaar-dost',      desc:"Daaman's friends",                color:'#36429A', zones:['z4','z3']},
+  {id:'crew',     name:'Crew',           desc:'Pandit ji, stylist, helpers',     color:'#6F655C', zones:['z1','z4']},
+];
+const ZONES = [
+  {id:'z1', name:'Chowk Gali',  sub:'Nearest the lawns · Dulha villa, elders, crew', from:1,  to:6},
+  {id:'z2', name:'Dadihal Pol', sub:'Paternal side',                                 from:7,  to:12},
+  {id:'z3', name:'Nanihal Pol', sub:'Maternal side · Mayra party',                   from:13, to:18},
+  {id:'z4', name:'Masti Gali',  sub:'Far lane · friends & late nights',              from:19, to:23},
+];
+/* Sample guest list (placeholders by relation). Member format: "Name|flags|pinnedRoom"
+   flags: e = elder (needs ground floor), k = kid (counts as half a bed). nights: digits 0/1/2 = 27 Feb / 28 Feb / 1 Mar */
+const SAMPLE = [
+  ['Dulha','ghar','012',['Daaman (Dulha)||V01-A']],
+  ['Papa & Mummy','ghar','012',['Papa||V01-B','Mummy||V01-B']],
+  ['Dada–Dadi','ghar','012',['Dadaji|e','Dadiji|e']],
+  ['Bhaiya–Bhabhi','ghar','012',['Bhaiya','Bhabhi','Bhatija|k']],
+  ['Didi–Jiju','ghar','012',['Didi','Jiju','Bhanji|k']],
+  ['Nana–Nani','nanihal','12',['Nanaji|e','Naniji|e']],
+  ['Bade Mama (Mayra)','nanihal','12',['Bade Mama','Badi Mami','Mama ka beta']],
+  ['Chhote Mama','nanihal','12',['Chhote Mama','Chhoti Mami','Cousin (8)|k','Cousin (5)|k']],
+  ['Badi Mausi','nanihal','12',['Badi Mausi','Mausa ji','Mausi ki beti']],
+  ['Chhoti Mausi','nanihal','12',['Chhoti Mausi','Chhote Mausa ji','Cousin (6)|k']],
+  ["Mummy's cousins",'nanihal','12',['Cousin Mama','Cousin Mami','Cousin bhai','Cousin behen']],
+  ["Nani's brother",'nanihal','2',['Nani ke bhai|e','Unki patni|e']],
+  ['Tau–Tai ji','dadihal','12',['Tauji','Taiji','Tauji ka beta']],
+  ['Chacha–Chachi','dadihal','12',['Chachaji','Chachiji','Cousin (10)|k','Cousin (7)|k']],
+  ['Bua–Fufa','dadihal','12',['Bua ji','Fufa ji','Bua ki beti','Cousin (4)|k']],
+  ['Chhoti Bua','dadihal','12',['Chhoti Bua','Chhote Fufa ji']],
+  ['Cousin bhaiya–bhabhi','dadihal','12',['Cousin bhaiya','Cousin bhabhi']],
+  ["Papa's cousin",'dadihal','2',['Papa ke cousin','Unki patni','Unka beta']],
+  ["Dadi's sister",'dadihal','12',["Dadi ki behen|e",'Unki beti']],
+  ["Dada's brother",'dadihal','12',['Chhote Dadaji|e','Chhoti Dadiji|e']],
+  ["Mummy's Mama ji",'rishtedar','2',['Mama ji','Mami ji','Unka beta']],
+  ["Papa's Mausi",'rishtedar','2',['Mausi Dadi|e','Unke bete','Unki bahu']],
+  ["Bhabhi's parents",'rishtedar','2',['Bhabhi ke papa','Bhabhi ki mummy']],
+  ["Jiju's parents",'rishtedar','2',['Jiju ke papa','Jiju ki mummy']],
+  ['Second cousins','rishtedar','12',['Second cousin 1','Second cousin 2','Second cousin 3','Second cousin 4']],
+  ["Papa's business friend",'mitra','2',['Uncle','Aunty','Unki beti']],
+  ["Papa's school friend",'mitra','2',['School-friend uncle','Aunty']],
+  ["Mummy's kitty group",'mitra','2',['Kitty aunty 1','Kitty aunty 2','Kitty aunty 3']],
+  ['Neighbours','mitra','12',['Padosi uncle','Padosi aunty']],
+  ['School gang','yaar','12',['School friend 1','School friend 2','School friend 3','School friend 4','School friend 5']],
+  ['College gang','yaar','012',['College friend 1','College friend 2','College friend 3','College friend 4','College friend 5','College friend 6']],
+  ['Work friends','yaar','2',['Work friend 1','Work friend 2','Work friend 3','Work friend 4']],
+  ['Best man & partner','yaar','012',['Best man','Partner']],
+  ['Pandit ji','crew','2',['Pandit ji','Sahayak']],
+  ["Groom's stylist",'crew','12',['Stylist','Stylist assistant']],
+  ['Helpers & drivers','crew','12',['Helper 1','Helper 2','Driver']],
+  ["Late RSVP: Papa's colleague",'mitra','2',['Colleague uncle','Colleague aunty'],true],
+  ["Late RSVP: Didi's in-laws",'rishtedar','2',["Didi ke sasur ji|e","Didi ki saas ji|e",'Devar ji'],true],
+  ['Plus-ones (TBC)','yaar','2',['Plus-one 1','Plus-one 2'],true],
+];
+const ROOM_CAP = 3;       // beds incl. one extra mattress
+const COMFY = 2.5;        // above this an extra mattress is needed
+const LS_KEY = 'rd-villa-allotment-v1';
+
+/* =====================================================================
+   STATE
+   ===================================================================== */
+let seq = 0;
+const uid = () => 'g' + Date.now().toString(36) + (seq++).toString(36);
+const UI = {tab:'map', sel:null, villa:null, q:'', gf:'all', showWarns:false};
+let S = null;
+
+function buildVillas(){
+  const v = [];
+  for (const z of ZONES) for (let n = z.from; n <= z.to; n++){
+    const id = 'V' + String(n).padStart(2,'0');
+    v.push({id, label:'Villa ' + n, zone:z.id, note:'',
+      rooms:['A','B','C'].map((r,i)=>({id:id+'-'+r, label:'Room '+r, ground:i===0, reserved:''}))});
+  }
+  v[0].note = 'Dulha villa';
+  v[0].rooms[2].reserved = "Dulha's getting-ready room";
+  v[5].note = 'Help desk & store';
+  v[5].rooms[2].reserved = 'Store: gifts, Mayra & shagun saman';
+  return v;
+}
+function seed(){
+  const guests = [];
+  for (const [hh, group, nights, members, hold] of SAMPLE){
+    for (const m of members){
+      const [name, flags='', pin=''] = m.split('|');
+      guests.push({id:uid(), name, hh, group, elder:flags.includes('e'), kid:flags.includes('k'),
+        nights:[0,1,2].map(i=>nights.includes(String(i))), phone:'', room:pin||null, hold:!!hold});
+    }
+  }
+  S = {villas:buildVillas(), guests, sample:true};
+  autoAssign(g => !g.hold);
+  S.guests.forEach(g => delete g.hold);
+  return S;
+}
+function save(){ try{ localStorage.setItem(LS_KEY, JSON.stringify(S)); }catch(e){} }
+function load(){
+  try{ const d = JSON.parse(localStorage.getItem(LS_KEY)); if (d && Array.isArray(d.villas) && Array.isArray(d.guests)) return d; }catch(e){}
+  return null;
+}
+
+/* =====================================================================
+   HELPERS
+   ===================================================================== */
+const $ = s => document.querySelector(s);
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const grp = id => GROUPS.find(g=>g.id===id) || GROUPS[0];
+const zone = id => ZONES.find(z=>z.id===id);
+const villaById = id => S.villas.find(v=>v.id===id);
+const villaOf = roomId => roomId ? villaById(roomId.slice(0,3)) : null;
+const roomById = roomId => { const v = villaOf(roomId); return v && v.rooms.find(r=>r.id===roomId); };
+const guest = id => S.guests.find(g=>g.id===id);
+const units = g => g.kid ? 0.5 : 1;
+const occ = roomId => S.guests.filter(g=>g.room===roomId);
+const load_ = (roomId,n) => occ(roomId).filter(g=>g.nights[n]).reduce((a,g)=>a+units(g),0);
+const fmt = n => Number.isInteger(n) ? String(n) : n.toFixed(1);
+const plural = (n,w) => `${n} ${w}${n===1?'':'s'}`;
+function households(){
+  const m = new Map();
+  for (const g of S.guests){
+    if (!m.has(g.hh)) m.set(g.hh, {name:g.hh, group:g.group, members:[]});
+    m.get(g.hh).members.push(g);
+  }
+  return [...m.values()];
+}
+function roomState(roomId, n){
+  const l = load_(roomId, n);
+  return l === 0 ? '' : l > ROOM_CAP ? 'bad' : l > COMFY ? 'mat' : 'ok';
+}
+function pips(roomId){
+  return `<span class="pips" title="People per night">` + NIGHTS.map((nt,n)=>{
+    const l = occ(roomId).filter(g=>g.nights[n]).length;
+    return `<span class="pip ${roomState(roomId,n)}" title="${nt.label}: ${l} ${l===1?'person':'people'}">${nt.short}${l?'·'+l:''}</span>`;
+  }).join('') + `</span>`;
+}
+function nightPips(g){
+  return `<span class="pips">` + NIGHTS.map((nt,n)=>`<span class="pip ${g.nights[n]?'ok':''}" title="${nt.label}">${nt.short}</span>`).join('') + `</span>`;
+}
+function toast(msg){
+  const t = $('#toast'); t.textContent = msg; t.classList.add('show');
+  clearTimeout(toast.t); toast.t = setTimeout(()=>t.classList.remove('show'), 2400);
+}
+
+/* =====================================================================
+   AUTO-ALLOT — keeps families together, groups in their lane,
+   elders on ground floor near the lawns
+   ===================================================================== */
+function chunkHousehold(ms){
+  const adults = ms.filter(g=>!g.kid), kids = ms.filter(g=>g.kid);
+  const sum = c => c.reduce((a,g)=>a+units(g),0);
+  if (sum(ms) <= ROOM_CAP) return [ms.slice()];
+  const chunks = []; let i = 0;
+  while (i < adults.length){ const rem = adults.length - i; const take = rem === 3 && !kids.length ? 3 : Math.min(2, rem); chunks.push(adults.slice(i, i+take)); i += take; }
+  if (!chunks.length) chunks.push([]);
+  for (const k of kids){ let c = chunks.find(c=>sum(c)+0.5 <= ROOM_CAP); if (!c){ c = []; chunks.push(c); } c.push(k); }
+  return chunks;
+}
+const freeRooms = v => v.rooms.filter(r=>!r.reserved && occ(r.id).length===0);
+function autoAssign(filter = () => true){
+  const hhs = households().map(h=>({...h, todo:h.members.filter(g=>!g.room && filter(g))})).filter(h=>h.todo.length);
+  const rank = h => h.group==='ghar' ? 0 : h.todo.some(g=>g.elder) ? 1 : h.group==='crew' ? 2 : 3 + GROUPS.findIndex(g=>g.id===h.group);
+  hhs.sort((a,b)=> rank(a)-rank(b) || b.todo.length-a.todo.length);
+  let left = 0;
+  for (const h of hhs){
+    const chunks = chunkHousehold(h.todo);
+    const elderChunks = chunks.filter(c=>c.some(g=>g.elder)).length;
+    const pref = grp(h.group).zones;
+    const zones = [...(elderChunks ? ['z1'] : []), ...pref, ...ZONES.map(z=>z.id)].filter((z,i,a)=>a.indexOf(z)===i);
+    const score = v => { const gs = v.rooms.flatMap(r=>occ(r.id)).map(g=>g.group); return gs.includes(h.group) ? 2 : gs.length ? 0 : 1; };
+    let target = null;
+    for (const z of zones){
+      const cands = S.villas.filter(v=>v.zone===z).filter(v=>{
+        const fr = freeRooms(v); return fr.length >= chunks.length && fr.filter(r=>r.ground).length >= elderChunks;
+      }).sort((a,b)=>score(b)-score(a));
+      if (cands.length){ target = cands[0]; break; }
+    }
+    if (target){
+      const fr = freeRooms(target);
+      chunks.sort((a,b)=>b.some(g=>g.elder)-a.some(g=>g.elder)).forEach(c=>{
+        const isE = c.some(g=>g.elder);
+        let r = fr.find(r=>r.ground===isE) || fr[0];
+        fr.splice(fr.indexOf(r),1); c.forEach(g=>g.room=r.id);
+      });
+    } else {
+      for (const c of chunks){
+        let r = null;
+        for (const z of zones){ for (const v of S.villas.filter(v=>v.zone===z)){ r = freeRooms(v)[0]; if (r) break; } if (r) break; }
+        if (r) c.forEach(g=>g.room=r.id); else left += c.length;
+      }
+    }
+  }
+  return left;
+}
+
+/* =====================================================================
+   WARNINGS
+   ===================================================================== */
+function warnings(){
+  const W = [];
+  for (const v of S.villas) for (const r of v.rooms){
+    const o = occ(r.id); if (!o.length) continue;
+    if (r.reserved) W.push({lvl:'bad', v:v.id, t:`${v.label} · ${r.label} is reserved (${r.reserved}) but has guests`});
+    const worst = Math.max(...NIGHTS.map((_,n)=>load_(r.id,n)));
+    if (worst > ROOM_CAP) W.push({lvl:'bad', v:v.id, t:`${v.label} · ${r.label} is over capacity (${fmt(worst)} beds needed, max ${ROOM_CAP})`});
+    o.filter(g=>g.elder && !r.ground).forEach(g=>W.push({lvl:'warn', v:v.id, t:`${g.name} (elder) is in ${v.label} · ${r.label}, which is not ground floor`}));
+  }
+  for (const h of households()){
+    const placed = h.members.filter(g=>g.room);
+    const vs = [...new Set(placed.map(g=>villaOf(g.room).id))];
+    if (vs.length > 1) W.push({lvl:'info', v:vs[0], t:`${h.name} is split across ${vs.map(id=>villaById(id).label).join(' & ')}`});
+    placed.filter(g=>g.kid).forEach(k=>{
+      const vid = villaOf(k.room).id;
+      if (!placed.some(a=>!a.kid && villaOf(a.room).id===vid)) W.push({lvl:'warn', v:vid, t:`${k.name} (${h.name}) has no adult from their family in ${villaById(vid).label}`});
+    });
+  }
+  return W.sort((a,b)=>['bad','warn','info'].indexOf(a.lvl)-['bad','warn','info'].indexOf(b.lvl));
+}
+
+/* =====================================================================
+   RENDER
+   ===================================================================== */
+function render(){
+  document.querySelectorAll('.tabs button').forEach(b=>b.setAttribute('aria-selected', b.dataset.tab===UI.tab));
+  renderBanner(); renderStats(); renderWarns();
+  ({map:renderMap, board:renderBoard, guests:renderGuests, print:renderPrint})[UI.tab]();
+  renderDrawer();
+}
+function renderBanner(){
+  $('#banner').innerHTML = S.sample ? `<div class="banner noprint"><span><b>This is sample data.</b> Families are placeholders by relation — import your real guest list (CSV) or edit names in the Guest list tab.</span>
+    <span class="row"><button class="btn small" data-act="template">Download CSV template</button><button class="btn small primary" data-act="import-csv">Import guest list</button><button class="btn small ghost" data-act="dismiss-sample">Dismiss</button></span></div>` : '';
+}
+function renderStats(){
+  const total = S.guests.length, placed = S.guests.filter(g=>g.room).length;
+  const rooms = S.villas.flatMap(v=>v.rooms), usable = rooms.filter(r=>!r.reserved);
+  const used = usable.filter(r=>occ(r.id).length).length;
+  const mattress = Math.max(...NIGHTS.map((_,n)=>rooms.filter(r=>load_(r.id,n) > COMFY).length));
+  const W = warnings(), serious = W.filter(w=>w.lvl!=='info').length;
+  const perNight = NIGHTS.map((_,n)=>S.guests.filter(g=>g.room && g.nights[n]).length);
+  $('#stats').innerHTML = `
+    <div class="stat"><b>${placed}<span class="muted" style="font-size:16px"> / ${total}</span></b><small>guests have a room</small></div>
+    <div class="stat"><b>${used}<span class="muted" style="font-size:16px"> / ${usable.length}</span></b><small>rooms in use (${rooms.length-usable.length} reserved)</small></div>
+    <div class="stat"><b>${usable.length-used}</b><small>rooms still free</small></div>
+    <div class="stat"><b>${mattress}</b><small>extra mattresses to request</small></div>
+    <div class="stat"><div class="nightsbar">${NIGHTS.map((nt,n)=>`<div><b>${perNight[n]}</b><small>${nt.label}</small></div>`).join('')}</div><small>sleeping on site, per night</small></div>
+    <div class="stat click ${serious?'alert':''}" data-act="toggle-warns"><b>${serious}</b><small>${serious?'issues to fix':'no issues'} · ${W.length-serious} notes ${UI.showWarns?'▲':'▼'}</small></div>`;
+}
+function renderWarns(){
+  const W = warnings();
+  $('#warns').innerHTML = UI.showWarns && W.length ? `<div class="warns noprint">${W.map(w=>`<div data-open="${w.v||''}"><span class="lvl ${w.lvl}">${w.lvl==='bad'?'fix':w.lvl==='warn'?'check':'note'}</span><span>${esc(w.t)}</span></div>`).join('')}</div>` : '';
+}
+function legend(){
+  return `<div class="legend">${GROUPS.map(g=>{
+    const n = S.guests.filter(x=>x.group===g.id).length;
+    return `<span title="${esc(g.desc)}"><i class="dot" style="background:${g.color}"></i>${esc(g.name)} <span class="muted">${n}</span></span>`;
+  }).join('')}<span><i class="dot" style="background:url(#);background:repeating-linear-gradient(45deg,#EADBC0 0 3px,#B9A07C 3px 5px)"></i>Reserved</span>
+  <span><i class="dot" style="background:#F3E9D6;border:1px solid #D9C7A8"></i>Empty</span></div>`;
+}
+
+/* --- the little haveli --- */
+function villaSVG(v){
+  const W = warnings().filter(w=>w.v===v.id && w.lvl!=='info');
+  const xs = [22, 52, 82];
+  const wins = v.rooms.map((r,i)=>{
+    const o = occ(r.id), x = xs[i], y = 52;
+    let fill = '#F3E9D6', txt = '', tcol = '#fff';
+    if (r.reserved) fill = 'url(#hatch)';
+    else if (o.length){
+      const counts = {}; o.forEach(g=>counts[g.group]=(counts[g.group]||0)+1);
+      fill = grp(Object.entries(counts).sort((a,b)=>b[1]-a[1])[0][0]).color; txt = o.length;
+    }
+    const mixed = !r.reserved && new Set(o.map(g=>g.group)).size > 1;
+    const tip = `${r.label}${r.ground?' (ground floor)':''}: ` + (r.reserved ? r.reserved : o.length ? o.map(g=>g.name).join(', ') : 'empty');
+    return `<g><title>${esc(tip)}</title>
+      <path d="M${x} ${y+30} V${y+9} A8 8 0 0 1 ${x+16} ${y+9} V${y+30} Z" fill="${fill}" stroke="#8C6B4F" stroke-width="1.2"/>
+      ${mixed?`<path d="M${x} ${y+30} L${x+16} ${y+14} V${y+30} Z" fill="${grp(o.find(g=>g.group!==o[0].group).group).color}" opacity=".9"/>`:''}
+      ${r.ground?`<rect x="${x-1}" y="${y+31}" width="18" height="2.4" rx="1" fill="#5C7F1F"/>`:''}
+      ${txt?`<text x="${x+8}" y="${y+24}" text-anchor="middle" font-size="11" font-weight="700" fill="${tcol}" font-family="DM Sans,sans-serif">${txt}</text>`:''}
+    </g>`;
+  }).join('');
+  const dulha = v.note && /dulha/i.test(v.note);
+  const toran = dulha ? Array.from({length:11},(_,i)=>`<circle cx="${16+i*8.8}" cy="${45+(i%2)*2}" r="2.6" fill="${i%2?'#E4572E':'#F2A007'}"/>`).join('') : '';
+  return `<svg viewBox="0 0 120 104" role="img" aria-label="${esc(v.label)}">
+    <path d="M44 30 Q60 6 76 30 Z" fill="#E9D3AE" stroke="#8C6B4F" stroke-width="1.2"/>
+    <line x1="60" y1="4" x2="60" y2="12" stroke="#8C6B4F" stroke-width="1.4"/><circle cx="60" cy="4" r="2" fill="${dulha?'#E4572E':'#C9A46A'}"/>
+    <rect x="8" y="30" width="104" height="8" rx="2" fill="#E9D3AE" stroke="#8C6B4F" stroke-width="1.2"/>
+    ${[14,30,46,62,78,94].map(x=>`<rect x="${x}" y="26" width="10" height="5" rx="1" fill="#E9D3AE" stroke="#8C6B4F" stroke-width="1"/>`).join('')}
+    <rect x="12" y="38" width="96" height="50" fill="#FFF8EA" stroke="#8C6B4F" stroke-width="1.2"/>
+    ${toran}${wins}
+    <rect x="6" y="88" width="108" height="7" rx="2" fill="#D9BF94" stroke="#8C6B4F" stroke-width="1.2"/>
+  </svg>${W.length?`<i class="flag ${W.some(w=>w.lvl==='bad')?'':'warn'}" title="${esc(W.map(w=>w.t).join('\n'))}"></i>`:''}`;
+}
+function villaMeta(v){
+  const o = v.rooms.flatMap(r=>occ(r.id));
+  if (!o.length) return v.note ? esc(v.note) : '<span class="muted">empty</span>';
+  const hh = [...new Set(o.map(g=>g.hh))];
+  return esc(v.note ? v.note : hh.length===1 ? hh[0] : `${hh[0]} +${hh.length-1}`);
+}
+function renderMap(){
+  const zoneHTML = z => `<section class="zone" data-z="${z.id}" style="grid-area:${z.id}">
+    <div class="sign"><h2>${esc(z.name)}</h2><small>${esc(z.sub)} · Villas ${z.from}–${z.to}</small></div>
+    <div class="lane">${S.villas.filter(v=>v.zone===z.id).map(v=>`
+      <button class="villa ${UI.villa===v.id?'active':''}" data-open="${v.id}">
+        ${villaSVG(v)}<div class="vl">${esc(v.label)}</div><div class="vm">${villaMeta(v)}</div>
+      </button>`).join('')}</div></section>`;
+  $('#view').innerHTML = `
+    <div class="events">${EVENTS.map(e=>`<div class="ev"><h3>${e.day}</h3><p>${e.items}</p></div>`).join('')}</div>
+    ${legend()}
+    <div class="site">
+      ${zoneHTML(ZONES[0])}${zoneHTML(ZONES[1])}
+      <div class="chowk">
+        ${mandapSVG()}
+        <h2>The Chowk</h2>
+        <p>Lawns &amp; mandap · Haldi, Sangeet, Phere</p>
+        <p class="muted" style="font-size:12px;margin-top:6px">Each house is a villa. Its three arched windows are its three rooms, coloured by the family staying there. A green line under a window means ground floor.</p>
+      </div>
+      ${zoneHTML(ZONES[2])}${zoneHTML(ZONES[3])}
+    </div>
+    <p class="note">Schematic, not to scale. Rename villas to match the venue's own numbering by clicking any villa. Lanes are a suggested zoning: elders and the Dulha villa sit closest to the lawns, and friends are at the far end so late nights don't disturb anyone.</p>`;
+}
+function mandapSVG(){
+  return `<svg viewBox="0 0 160 100" aria-hidden="true">
+    <ellipse cx="80" cy="88" rx="70" ry="8" fill="#BCD08F"/>
+    <path d="M30 34 Q80 0 130 34 Z" fill="#7A1631"/>
+    <path d="M30 34 Q80 14 130 34" fill="none" stroke="#F2A007" stroke-width="2"/>
+    ${[36,62,98,124].map(x=>`<rect x="${x-3}" y="34" width="6" height="52" fill="#E9D3AE" stroke="#8C6B4F"/>`).join('')}
+    ${Array.from({length:12},(_,i)=>`<circle cx="${36+i*8}" cy="${38+Math.sin(i/11*Math.PI)*7}" r="3" fill="${i%2?'#E4572E':'#F2A007'}"/>`).join('')}
+    <path d="M72 84 L80 70 L88 84 Z" fill="#E4572E"/><path d="M76 84 L80 75 L84 84 Z" fill="#F2A007"/>
+  </svg>`;
+}
+
+/* --- board --- */
+function chipHTML(g, removable){
+  const sel = UI.sel && UI.sel.type==='g' && UI.sel.id===g.id;
+  return `<span class="chip ${sel?'sel':''}" draggable="true" data-g="${g.id}" title="${esc(g.hh)} · ${NIGHTS.filter((_,n)=>g.nights[n]).map(n=>n.label).join(', ')}">
+    <i class="dot" style="background:${grp(g.group).color}"></i>${esc(g.name)}${g.elder?'<span class="tag">elder</span>':''}${g.kid?'<span class="tag">kid</span>':''}
+    ${removable?`<button class="x" data-unassign="${g.id}" aria-label="Remove ${esc(g.name)} from room">×</button>`:''}</span>`;
+}
+function renderBoard(){
+  const q = UI.q.trim().toLowerCase();
+  const hhs = households().map(h=>({...h, un:h.members.filter(g=>!g.room)}))
+    .filter(h=>h.un.length && (UI.gf==='all' || h.group===UI.gf) && (!q || h.name.toLowerCase().includes(q) || h.un.some(g=>g.name.toLowerCase().includes(q))));
+  const selName = UI.sel ? (UI.sel.type==='g' ? guest(UI.sel.id)?.name : UI.sel.id) : '';
+  $('#view').innerHTML = `
+    ${legend()}
+    <div class="board ${UI.sel?'placing':''}">
+      <aside class="side">
+        <header>
+          <div class="row" style="justify-content:space-between"><h2>Need a room</h2><span class="muted">${S.guests.filter(g=>!g.room).length} guests</span></div>
+          <input class="field" type="search" placeholder="Search family or name…" value="${esc(UI.q)}" data-k="q">
+          <select class="field" data-k="gf"><option value="all">All groups</option>${GROUPS.map(g=>`<option value="${g.id}" ${UI.gf===g.id?'selected':''}>${esc(g.name)}</option>`).join('')}</select>
+          <div class="row"><button class="btn small primary" data-act="auto">✦ Suggest allotment</button><button class="btn small" data-act="clear">Clear all</button></div>
+        </header>
+        <div class="list" data-drop="unassign">
+          ${hhs.length ? hhs.map(h=>`<div class="hh ${UI.sel&&UI.sel.type==='h'&&UI.sel.id===h.name?'sel':''}" style="--c:${grp(h.group).color}">
+              <div class="hhh" draggable="true" data-h="${esc(h.name)}" title="Drag the whole family, or tap to pick it up"><span>${esc(h.name)}</span><small>${h.un.length} · ${esc(grp(h.group).name)}</small></div>
+              <div class="chips">${h.un.map(g=>chipHTML(g,false)).join('')}</div></div>`).join('')
+            : `<p class="muted" style="text-align:center;padding:20px 6px">${S.guests.some(g=>!g.room)?'No matches.':'Everyone has a room 🎉<br><small>Drag a guest here to unassign.</small>'}</p>`}
+        </div>
+      </aside>
+      <div class="mainb">
+        ${UI.sel?`<div class="placingbar"><span>Placing <b>${esc(selName)}</b>: tap a room</span><button class="btn small" data-act="cancel-sel">Cancel</button></div>`:''}
+        ${ZONES.map(z=>`<h2 class="zh">${esc(z.name)}<small>${esc(z.sub)}</small></h2>
+          <div class="vgrid">${S.villas.filter(v=>v.zone===z.id).map(v=>`
+            <article class="vcard">
+              <header><b>${esc(v.label)}${v.note?` <small>· ${esc(v.note)}</small>`:''}</b><button class="btn small ghost" data-open="${v.id}">Edit</button></header>
+              ${v.rooms.map(r=>`<div class="slot ${r.reserved?'reserved':''}" data-drop="${r.id}">
+                  <div class="sh"><span>${esc(r.label)}${r.ground?'<span class="badge">GROUND</span>':''}</span>${r.reserved?'':pips(r.id)}</div>
+                  ${r.reserved?`<div class="muted" style="font-size:12.5px;margin-top:4px">Reserved: ${esc(r.reserved)}</div>`:`<div class="chips">${occ(r.id).map(g=>chipHTML(g,true)).join('')}</div>`}
+                </div>`).join('')}
+            </article>`).join('')}</div>`).join('')}
+      </div>
+    </div>`;
+}
+
+/* --- guests table --- */
+function renderGuests(){
+  const q = UI.q.trim().toLowerCase();
+  const list = S.guests.filter(g=>(UI.gf==='all'||g.group===UI.gf) && (!q || (g.name+' '+g.hh).toLowerCase().includes(q)));
+  const roomOpts = sel => `<option value="">— unassigned —</option>` + S.villas.map(v=>`<optgroup label="${esc(v.label)}">${v.rooms.filter(r=>!r.reserved).map(r=>`<option value="${r.id}" ${sel===r.id?'selected':''}>${esc(v.label)} · ${esc(r.label)}</option>`).join('')}</optgroup>`).join('');
+  $('#view').innerHTML = `
+    <div class="toolbar noprint">
+      <div class="row"><input class="field" style="width:240px" type="search" placeholder="Search…" value="${esc(UI.q)}" data-k="q">
+        <select class="field" style="width:auto" data-k="gf"><option value="all">All groups</option>${GROUPS.map(g=>`<option value="${g.id}" ${UI.gf===g.id?'selected':''}>${esc(g.name)}</option>`).join('')}</select></div>
+      <div class="row">
+        <button class="btn small primary" data-act="add-guest">+ Add guest</button>
+        <button class="btn small" data-act="import-csv">Import CSV</button>
+        <button class="btn small" data-act="export-csv">Export CSV</button>
+        <button class="btn small" data-act="export-json">Backup (JSON)</button>
+        <button class="btn small" data-act="import-json">Restore</button>
+        <button class="btn small ghost" data-act="reset">Reset to sample</button>
+      </div>
+    </div>
+    <div class="tablewrap"><table>
+      <thead><tr><th>Name</th><th>Family / household</th><th>Group</th><th class="c">Elder</th><th class="c">Kid</th>${NIGHTS.map(n=>`<th class="c" title="${n.sub}">${n.label}</th>`).join('')}<th>Phone</th><th>Room</th><th></th></tr></thead>
+      <tbody>${list.map(g=>`<tr>
+        <td><input type="text" value="${esc(g.name)}" data-ge="name" data-id="${g.id}"></td>
+        <td><input type="text" value="${esc(g.hh)}" data-ge="hh" data-id="${g.id}" list="hhlist"></td>
+        <td><select data-ge="group" data-id="${g.id}">${GROUPS.map(x=>`<option value="${x.id}" ${g.group===x.id?'selected':''}>${esc(x.name)}</option>`).join('')}</select></td>
+        <td class="c"><input type="checkbox" ${g.elder?'checked':''} data-ge="elder" data-id="${g.id}"></td>
+        <td class="c"><input type="checkbox" ${g.kid?'checked':''} data-ge="kid" data-id="${g.id}"></td>
+        ${NIGHTS.map((_,n)=>`<td class="c"><input type="checkbox" ${g.nights[n]?'checked':''} data-ge="night" data-n="${n}" data-id="${g.id}"></td>`).join('')}
+        <td><input type="text" value="${esc(g.phone)}" data-ge="phone" data-id="${g.id}" placeholder="—"></td>
+        <td><select data-ge="room" data-id="${g.id}">${roomOpts(g.room)}</select></td>
+        <td><button class="btn small ghost" data-del="${g.id}" aria-label="Delete ${esc(g.name)}">✕</button></td>
+      </tr>`).join('')}</tbody></table>
+      <datalist id="hhlist">${households().map(h=>`<option value="${esc(h.name)}">`).join('')}</datalist>
+    </div>
+    <p class="note">${list.length} of ${S.guests.length} guests shown. Nights = which nights they sleep at the venue. Rooms are checked night by night, so a room freed after Sangeet can host someone arriving for the Reception.</p>`;
+}
+
+/* --- print --- */
+function renderPrint(){
+  const vs = S.villas.filter(v=>v.rooms.some(r=>occ(r.id).length));
+  const all = S.guests.filter(g=>g.room).sort((a,b)=>a.name.localeCompare(b.name));
+  $('#view').innerHTML = `
+    <div class="toolbar noprint"><p class="muted" style="margin:0">Door cards for each occupied villa, plus an A–Z list for the help desk.</p><button class="btn primary" data-act="print">Print</button></div>
+    <div class="cards">${vs.map(v=>`<div class="door">
+      <div class="kicker">Welcome to</div><h3>${esc(v.label)}</h3><div class="zn">${esc(zone(v.zone).name)}${v.note?' · '+esc(v.note):''}</div>
+      ${v.rooms.map(r=>`<div class="rm"><b>${esc(r.label)}${r.ground?' · Ground floor':''}</b>${r.reserved?esc(r.reserved):occ(r.id).map(g=>esc(g.name)).join(', ')||'<span class="muted">—</span>'}</div>`).join('')}
+      <div class="foot">Rishika ♥ Daaman · 28 Feb – 2 Mar</div></div>`).join('')}</div>
+    <h2 class="pagebreak" style="color:var(--maroon);margin-top:28px">Help desk: who is where (A–Z)</h2>
+    <div class="master">${all.map(g=>{const v=villaOf(g.room),r=roomById(g.room);return `<div><span>${esc(g.name)} <span class="muted">· ${esc(g.hh)}</span></span><b>${esc(v.label)} · ${esc(r.label.replace('Room ',''))}</b></div>`}).join('')}</div>`;
+}
+
+/* --- drawer --- */
+function renderDrawer(){
+  const d = $('#drawer'), v = UI.villa && villaById(UI.villa);
+  d.classList.toggle('open', !!v);
+  if (!v){ d.innerHTML = ''; return; }
+  const un = S.guests.filter(g=>!g.room);
+  d.innerHTML = `
+    <button class="close" data-act="close" aria-label="Close">×</button>
+    <div class="muted" style="font-size:12.5px">${esc(zone(v.zone).name)}</div>
+    <h2>${esc(v.label)}</h2>
+    <label class="f">Villa name (match the venue's numbering)<input class="field" value="${esc(v.label)}" data-ve="label"></label>
+    <label class="f">Note<input class="field" value="${esc(v.note)}" placeholder="e.g. Dulha villa, Mayra party…" data-ve="note"></label>
+    <label class="f">Lane<select class="field" data-ve="zone">${ZONES.map(z=>`<option value="${z.id}" ${v.zone===z.id?'selected':''}>${esc(z.name)}</option>`).join('')}</select></label>
+    ${v.rooms.map(r=>`<div class="rb">
+      <div class="rh"><b>${esc(r.label)}</b>${r.reserved?'':pips(r.id)}</div>
+      <label class="row" style="font-size:13px;margin-top:6px"><input type="checkbox" ${r.ground?'checked':''} data-re="ground" data-r="${r.id}"> Ground floor / no stairs</label>
+      <input class="field" style="margin-top:6px" value="${esc(r.reserved)}" placeholder="Reserve for… (leave empty for guests)" data-re="reserved" data-r="${r.id}">
+      <div style="margin-top:6px">${occ(r.id).map(g=>`<div class="occ"><span><i class="dot" style="background:${grp(g.group).color};border-radius:50%"></i> ${esc(g.name)}${g.hh!==g.name?` <span class="muted">· ${esc(g.hh)}</span>`:''}</span><span class="row">${nightPips(g)}<button class="btn small ghost" data-unassign="${g.id}" aria-label="Remove">×</button></span></div>`).join('')}</div>
+      ${r.reserved?'':`<select class="field" style="margin-top:6px" data-addto="${r.id}"><option value="">+ Add someone to ${esc(r.label)}…</option>${households().filter(h=>h.members.some(g=>!g.room)).map(h=>`<optgroup label="${esc(h.name)}">${h.members.filter(g=>!g.room).map(g=>`<option value="${g.id}">${esc(g.name)}</option>`).join('')}</optgroup>`).join('')}</select>`}
+    </div>`).join('')}
+    <p class="note">${un.length} guests still need a room.</p>`;
+}
+
+/* =====================================================================
+   ACTIONS
+   ===================================================================== */
+function commit(){ save(); render(); }
+function placeSelection(sel, roomId){
+  const r = roomById(roomId); if (!r || r.reserved){ toast('That room is reserved'); return; }
+  if (sel.type==='g'){ const g = guest(sel.id); if (g){ g.room = roomId; toast(`${g.name} → ${villaOf(roomId).label} · ${r.label}`); } }
+  else {
+    const h = households().find(h=>h.name===sel.id); if (!h) return;
+    const ms = h.members.filter(g=>!g.room); const pool = ms.length ? ms : h.members;
+    const chunks = chunkHousehold(pool); const v = villaOf(roomId);
+    const others = v.rooms.filter(x=>x.id!==roomId && !x.reserved && !occ(x.id).some(g=>!pool.includes(g)));
+    let left = 0;
+    pool.forEach(g=>g.room=null);
+    chunks.forEach((c,i)=>{ const target = i===0 ? r : others.shift(); if (target) c.forEach(g=>g.room=target.id); else left += c.length; });
+    toast(left ? `${h.name}: ${left} still need a room (villa full)` : `${h.name} → ${v.label}`);
+  }
+  UI.sel = null; commit();
+}
+function download(name, text, type){
+  const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([text],{type})); a.download = name; a.click();
+  setTimeout(()=>URL.revokeObjectURL(a.href), 1000);
+}
+const csvCell = s => /[",\n]/.test(String(s)) ? `"${String(s).replace(/"/g,'""')}"` : String(s);
+function exportCSV(){
+  const rows = [['name','household','group','elder','kid','nights','phone','villa','room','room_id']];
+  for (const g of S.guests){ const v = villaOf(g.room), r = roomById(g.room);
+    rows.push([g.name,g.hh,g.group,g.elder?'yes':'',g.kid?'yes':'',NIGHTS.filter((_,n)=>g.nights[n]).map(n=>n.short).join(' '),g.phone,v?v.label:'',r?r.label:'',g.room||'']); }
+  download('villa-allotment.csv', rows.map(r=>r.map(csvCell).join(',')).join('\n'), 'text/csv');
+}
+function parseCSV(t){
+  const rows=[]; let row=[], f='', q=false;
+  for (let i=0;i<t.length;i++){ const c=t[i];
+    if (q){ if (c==='"'){ if (t[i+1]==='"'){ f+='"'; i++; } else q=false; } else f+=c; }
+    else if (c==='"') q=true; else if (c===','){ row.push(f); f=''; }
+    else if (c==='\n'||c==='\r'){ if (c==='\r'&&t[i+1]==='\n') i++; row.push(f); rows.push(row); row=[]; f=''; }
+    else f+=c; }
+  if (f || row.length){ row.push(f); rows.push(row); }
+  return rows.filter(r=>r.some(x=>x.trim()));
+}
+function importCSV(text){
+  const rows = parseCSV(text); if (rows.length < 2){ toast('CSV looks empty'); return; }
+  const H = rows[0].map(h=>h.trim().toLowerCase()); const col = k => H.indexOf(k);
+  if (col('name')<0){ toast('CSV needs a "name" column'); return; }
+  const yes = s => /^(y|yes|1|true|x)$/i.test(String(s||'').trim());
+  const findGroup = s => { s = String(s||'').trim().toLowerCase(); return (GROUPS.find(g=>g.id===s||g.name.toLowerCase()===s) || GROUPS.find(g=>s && g.name.toLowerCase().includes(s)) || {id:'rishtedar'}).id; };
+  const parseNights = s => { s = String(s||'').toLowerCase(); if (!s.trim()) return [false,true,true];
+    return [/27/.test(s), /28/.test(s), /(^|\D)1(\D|$)|mar/.test(s)]; };
+  const allRooms = new Set(S.villas.flatMap(v=>v.rooms.map(r=>r.id)));
+  const list = rows.slice(1).map(r=>{ const get = k => col(k)>=0 ? r[col(k)] : ''; const name = get('name').trim(); if (!name) return null;
+    const rid = (get('room_id')||'').trim().toUpperCase();
+    return {id:uid(), name, hh:get('household').trim()||name, group:findGroup(get('group')), elder:yes(get('elder')), kid:yes(get('kid')),
+      nights:parseNights(get('nights')), phone:get('phone').trim(), room: allRooms.has(rid) ? rid : null}; }).filter(Boolean);
+  const replace = confirm(`Found ${list.length} guests.\n\nOK = replace the current guest list\nCancel = add them to the current list`);
+  S.guests = replace ? list : S.guests.concat(list); S.sample = false;
+  UI.tab = 'board'; commit(); toast(`Imported ${list.length} guests`);
+}
+function templateCSV(){
+  download('guest-list-template.csv', ['name,household,group,elder,kid,nights,phone,room_id',
+    'Dadaji,Dada–Dadi,Ghar,yes,,27 28 1,,',
+    'Dadiji,Dada–Dadi,Ghar,yes,,27 28 1,,',
+    'Bade Mama,Bade Mama (Mayra),Nanihal,,,28 1,98xxxxxx01,',
+    'Cousin (8),Chhote Mama,Nanihal,,yes,28 1,,',
+    'College friend 1,College gang,Yaar-dost,,,27 28 1,,'].join('\n'), 'text/csv');
+}
+
+/* ---- events ---- */
+document.addEventListener('click', e=>{
+  const t = e.target;
+  const tab = t.closest('[data-tab]'); if (tab){ UI.tab = tab.dataset.tab; UI.sel = null; render(); return; }
+  const un = t.closest('[data-unassign]'); if (un){ const g = guest(un.dataset.unassign); if (g){ g.room = null; commit(); } return; }
+  const del = t.closest('[data-del]'); if (del){ const g = guest(del.dataset.del); if (g && confirm(`Delete ${g.name}?`)){ S.guests = S.guests.filter(x=>x!==g); commit(); } return; }
+  const act = t.closest('[data-act]');
+  if (act){ const a = act.dataset.act;
+    if (a==='close'){ UI.villa = null; render(); }
+    if (a==='toggle-warns'){ UI.showWarns = !UI.showWarns; render(); }
+    if (a==='auto'){ const left = autoAssign(); commit(); toast(left ? `${left} guests could not fit` : 'Suggested rooms for everyone. Review and adjust.'); }
+    if (a==='clear' && confirm('Remove every room assignment?')){ S.guests.forEach(g=>g.room=null); commit(); }
+    if (a==='cancel-sel'){ UI.sel = null; render(); }
+    if (a==='dismiss-sample'){ S.sample = false; commit(); }
+    if (a==='template') templateCSV();
+    if (a==='import-csv') $('#fileCsv').click();
+    if (a==='import-json') $('#fileJson').click();
+    if (a==='export-csv') exportCSV();
+    if (a==='export-json') download('villa-allotment-backup.json', JSON.stringify(S,null,1), 'application/json');
+    if (a==='reset' && confirm('Throw away all changes and reload the sample data?')){ seq=0; S = seed(); UI.villa=null; commit(); }
+    if (a==='print') window.print();
+    if (a==='add-guest'){ S.guests.unshift({id:uid(), name:'New guest', hh:'New family', group:UI.gf!=='all'?UI.gf:'rishtedar', elder:false, kid:false, nights:[false,true,true], phone:'', room:null}); commit(); const i = document.querySelector('[data-ge=name]'); i && i.select(); }
+    return; }
+  const open = t.closest('[data-open]'); if (open && open.dataset.open){ UI.villa = open.dataset.open; render(); return; }
+  // tap-to-place (works on phones where drag & drop doesn't)
+  const slot = t.closest('.slot[data-drop]');
+  if (slot && UI.sel){ placeSelection(UI.sel, slot.dataset.drop); return; }
+  const chip = t.closest('.chip[data-g]'); if (chip){ const id = chip.dataset.g; UI.sel = UI.sel && UI.sel.id===id ? null : {type:'g', id}; render(); return; }
+  const hh = t.closest('.hhh[data-h]'); if (hh){ const id = hh.dataset.h; UI.sel = UI.sel && UI.sel.id===id ? null : {type:'h', id}; render(); return; }
+});
+document.addEventListener('keydown', e=>{ if (e.key==='Escape'){ UI.sel = null; UI.villa = null; render(); } });
+document.addEventListener('input', e=>{
+  const k = e.target.dataset.k; if (k==='q'){ UI.q = e.target.value; const pos = e.target.selectionStart; render(); const el = document.querySelector('[data-k=q]'); if (el){ el.focus(); el.setSelectionRange(pos,pos); } }
+});
+document.addEventListener('change', e=>{
+  const t = e.target, d = t.dataset;
+  if (d.k==='gf'){ UI.gf = t.value; render(); return; }
+  if (d.ge){ const g = guest(d.id); if (!g) return;
+    if (d.ge==='night') g.nights[+d.n] = t.checked;
+    else if (d.ge==='elder'||d.ge==='kid') g[d.ge] = t.checked;
+    else if (d.ge==='room') g.room = t.value || null;
+    else g[d.ge] = t.value;
+    if (d.ge==='name' || d.ge==='hh') S.sample = false;
+    commit(); return; }
+  if (d.ve){ const v = villaById(UI.villa); v[d.ve] = t.value; commit(); return; }
+  if (d.re){ const r = roomById(d.r); r[d.re] = d.re==='ground' ? t.checked : t.value.trim(); commit(); return; }
+  if (d.addto && t.value){ const g = guest(t.value); g.room = d.addto; commit(); return; }
+});
+document.addEventListener('dragstart', e=>{
+  const c = e.target.closest && (e.target.closest('.chip[data-g]') || e.target.closest('.hhh[data-h]')); if (!c) return;
+  e.dataTransfer.setData('text/plain', JSON.stringify(c.dataset.g ? {type:'g', id:c.dataset.g} : {type:'h', id:c.dataset.h}));
+  e.dataTransfer.effectAllowed = 'move';
+});
+document.addEventListener('dragover', e=>{ const z = e.target.closest && e.target.closest('[data-drop]'); if (z){ e.preventDefault(); z.classList.add('over'); } });
+document.addEventListener('dragleave', e=>{ const z = e.target.closest && e.target.closest('[data-drop]'); if (z && !z.contains(e.relatedTarget)) z.classList.remove('over'); });
+document.addEventListener('drop', e=>{
+  const z = e.target.closest && e.target.closest('[data-drop]'); if (!z) return; e.preventDefault();
+  let sel; try{ sel = JSON.parse(e.dataTransfer.getData('text/plain')); }catch(_){ return; }
+  if (z.dataset.drop==='unassign'){
+    if (sel.type==='g'){ const g = guest(sel.id); if (g) g.room = null; }
+    else households().find(h=>h.name===sel.id)?.members.forEach(g=>g.room=null);
+    commit(); return; }
+  placeSelection(sel, z.dataset.drop);
+});
+const readFile = (input, fn) => input.addEventListener('change', ()=>{ const f = input.files[0]; if (!f) return; const r = new FileReader(); r.onload = ()=>{ fn(r.result); input.value=''; }; r.readAsText(f); });
+readFile($('#fileCsv'), importCSV);
+readFile($('#fileJson'), txt=>{ try{ const d = JSON.parse(txt); if (!Array.isArray(d.villas)||!Array.isArray(d.guests)) throw 0; S = d; commit(); toast('Backup restored'); }catch(_){ toast('That file is not a valid backup'); } });
+
+S = load() || seed();
+render();
+</script>
+</body>
+</html>
