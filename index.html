@@ -11,7 +11,7 @@
    Type: Rozha One (Indian display serif) for names of places, Mukta for everything you read and operate. */
 :root{
   --paper:#FAF7F3; --paper-2:#F2EBE2; --paper-3:#E6DACB;
-  --ink:#2B1A17; --ink-2:#6A524B; --ink-3:#97807A;
+  --ink:#2B1A17; --ink-2:#6A524B; --ink-3:#7A665F;
   --line:#E4D7C9; --card:#FFFFFF; --field:#FFFFFF;
   --accent:#7A1631; --accent-ink:#FFF4E6; --accent-text:#7A1631;
   --band:#6E1430; --band-ink:#FFF1E2; --band-ink-2:#F2C9B0; --band-dot:rgba(255,236,214,.16); --band-tab:rgba(255,241,226,.12); --gold:#E2B259;
@@ -30,7 +30,7 @@
 }
 @media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
   --paper:#171110; --paper-2:#211816; --paper-3:#30241F;
-  --ink:#F4E9DD; --ink-2:#C6B1A5; --ink-3:#917B70;
+  --ink:#F4E9DD; --ink-2:#C6B1A5; --ink-3:#A8948A;
   --line:#3A2C27; --card:#1F1715; --field:#271D1A;
   --accent:#A3264B; --accent-ink:#FFF1E6; --accent-text:#F2899F;
   --band:#3F0B1C; --band-ink:#FBEBDD; --band-ink-2:#DDAE93; --band-dot:rgba(255,226,200,.10); --band-tab:rgba(255,241,226,.10); --gold:#C79A45;
@@ -44,7 +44,7 @@
   color-scheme:dark}}
 :root[data-theme="dark"]{
   --paper:#171110; --paper-2:#211816; --paper-3:#30241F;
-  --ink:#F4E9DD; --ink-2:#C6B1A5; --ink-3:#917B70;
+  --ink:#F4E9DD; --ink-2:#C6B1A5; --ink-3:#A8948A;
   --line:#3A2C27; --card:#1F1715; --field:#271D1A;
   --accent:#A3264B; --accent-ink:#FFF1E6; --accent-text:#F2899F;
   --band:#3F0B1C; --band-ink:#FBEBDD; --band-ink-2:#DDAE93; --band-dot:rgba(255,226,200,.10); --band-tab:rgba(255,241,226,.10); --gold:#C79A45;
@@ -402,6 +402,21 @@ th[aria-sort] .sort .ic{opacity:1}
   td input[type=checkbox],.ms-o input,.rb input[type=checkbox]{width:24px;height:24px}
   th .sort{min-height:40px}.rchip button{padding:11px 8px}.iconbtn{width:44px;height:44px}td select.addroom{width:44px}}
 @media (prefers-reduced-motion:reduce){*{animation:none!important}}
+/* review fixes */
+:root{--field-line:#A8948A}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--field-line:#75635A}}
+:root[data-theme="dark"]{--field-line:#75635A}
+.field,.stepper,.ms-btn,.vtile select{border-color:var(--field-line)}
+::placeholder{color:var(--ink-3);opacity:1}
+.pip{color:var(--ink-2)}
+.placingbar .btn{color:var(--accent-text);background:var(--paper);border-color:var(--paper)}
+td input[type=text]:focus-visible,td input[type=number]:focus-visible,td select:focus-visible{outline:2px solid var(--accent-text)!important;outline-offset:-2px}
+.addform .stepper{min-height:38px}.addform .stepper button{height:36px}
+.filters select.field{font-size:14.5px;min-height:38px;padding-block:5px}
+.emptyrow{position:sticky;left:12px;display:inline-block;width:min(340px,calc(100vw - 60px));text-align:center;padding:22px 0}
+.pipkey{display:inline-flex;align-items:center;gap:5px}
+@media (max-width:980px){.side{max-height:72vh}.side .list{min-height:45vh}}
+@media (max-width:600px){table.gt col:first-child{width:128px!important}table.gt{width:1856px}}
 @media (max-width:1100px){.addform .grid{grid-template-columns:1fr 1fr 1fr}}
 @media (max-width:600px){.addform .grid{grid-template-columns:1fr 1fr}}
 @media (pointer:coarse){.stepper button{width:40px;height:40px}.stepper.mini button{width:40px;height:40px}.city{min-height:40px}}
@@ -480,7 +495,7 @@ th[aria-sort] .sort .ic{opacity:1}
   <div id="warns"></div>
   <main id="view"></main>
 </div>
-<aside id="drawer" class="drawer" aria-label="Villa details"></aside>
+<aside id="drawer" class="drawer" role="dialog" aria-label="Villa details"></aside>
 <div id="modal" class="modal" hidden><div class="mbox" role="dialog" aria-modal="true" aria-labelledby="mtitle"><h3 id="mtitle"></h3><p id="mbody"></p><div class="row" id="mbtns"></div></div></div>
 <div id="sheet" class="modal sheet" hidden><div class="mbox wide" id="sheetbox" role="dialog" aria-modal="true" aria-label="Backups"></div></div>
 <div id="toast" class="toast" role="status" aria-live="polite"><span id="toastmsg"></span><button id="toastbtn" hidden></button></div>
@@ -696,7 +711,7 @@ function toast(msg, action){
   const t = $('#toast'), b = $('#toastbtn');
   $('#toastmsg').textContent = msg; b.hidden = !action; t.classList.toggle('act', !!action);
   if (action){ b.textContent = action.label; b.onclick = () => { t.classList.remove('show'); action.fn(); }; }
-  t.classList.add('show'); clearTimeout(toast.t); toast.t = setTimeout(()=>t.classList.remove('show','act'), action ? 6500 : 3000);
+  t.classList.add('show'); clearTimeout(toast.t); toast.t = setTimeout(()=>t.classList.remove('show','act'), action ? 10000 : 3000);
 }
 const undoToast = msg => toast(msg, {label:'Undo', fn:undo});
 function ask(title, body, buttons){
@@ -920,9 +935,10 @@ function warnsHTML(){
   const W = warnings();
   return `<div class="warns">${W.length ? W.map(w=>`<button data-open="${w.v||''}"><span class="lvl ${w.lvl}">${w.lvl==='bad'?'fix':w.lvl==='warn'?'check':'note'}</span><span>${esc(w.t)}</span></button>`).join('') : '<p class="muted">Nothing to check right now.</p>'}</div>`;
 }
-function legend(){
+function legend(board){
   return `<div class="legend">${GROUPS.filter(g=>S.guests.some(x=>x.group===g.id) || g.id==='ghar').map(g=>`<span title="${esc(g.desc)}"><i class="dot" style="background:${g.color}"></i>${esc(g.name)} <span class="muted">${S.guests.filter(x=>x.group===g.id).length}</span></span>`).join('')}
-  <i class="sep"></i><span>${ic('window')}Window = room</span><span>Big arch = hall</span><span><i class="sill"></i>Ground floor</span><span><i class="dot res"></i>Held</span><span><i class="dot emp"></i>Empty</span></div>`;
+  <i class="sep"></i>${board ? `<span class="pipkey"><span class="pip ok">28·2</span>2 people on the night of 28 Feb</span><span class="pipkey"><span class="pip mat">28·3</span>using extra mattresses</span><span class="pipkey"><span class="pip bad">28·5</span>over: add mattresses</span><span class="pipkey"><span class="hc">2 + 1</span>adults + kids</span><span class="pipkey"><span class="hc">?</span>count not added</span>`
+    : `<span>${ic('window')}Window = room</span><span>Big arch = hall</span><span><i class="sill"></i>Ground floor</span><span><i class="dot res"></i>Held</span><span><i class="dot emp"></i>Empty</span>`}</div>`;
 }
 function emptyState(){
   if (!UI.loaded) return `<div class="skel" aria-label="Opening the plan" role="status"><i></i><i></i><i></i><i></i><i></i></div>`;
@@ -1010,14 +1026,14 @@ function mandapSVG(){
 /* --- allot board --- */
 function chipHTML(p, roomId){
   const sel = UI.sel && UI.sel.id===p.id && UI.sel.from===roomId;
-  return `<span class="chip ${sel?'sel':''}" id="chip-${p.id}-${roomId}" draggable="${drag()}" ${kbd()} aria-pressed="${sel}" data-g="${p.id}" data-from="${roomId}" title="${esc(p.name)}: ${esc(hcLong(p))}${p.from?', from '+esc(p.from):''}${p.rooms.length>1?`, across ${p.rooms.length} rooms`:''}">
+  return `<span class="chip ${sel?'sel':''}" id="chip-${p.id}-${roomId}" draggable="${drag()}" ${kbd()} aria-pressed="${!!sel}" data-g="${p.id}" data-from="${roomId}" title="${esc(p.name)}: ${esc(hcLong(p))}${p.from?', from '+esc(p.from):''}${p.rooms.length>1?`, across ${p.rooms.length} rooms`:''}">
     <i class="dot" style="background:${grp(p.group).color}"></i>${esc(p.name)} <span class="hc">${hcText(p)}</span>${p.elder?'<span class="tag">elders</span>':''}
     ${UI.canWrite?`<button class="x" data-unassign="${p.id}" data-r="${roomId}" aria-label="Take ${esc(p.name)} out of this room">${ic('x')}</button>`:''}</span>`;
 }
 function partyCard(p){
   const sel = UI.sel && UI.sel.id===p.id && !UI.sel.from;
   const need = needRooms(p) - p.rooms.length;
-  return `<div class="party ${sel?'sel':''}" id="party-${p.id}" draggable="${drag()}" ${kbd()} aria-pressed="${sel}" data-g="${p.id}">
+  return `<div class="party ${sel?'sel':''}" id="party-${p.id}" draggable="${drag()}" ${kbd()} aria-pressed="${!!sel}" data-g="${p.id}">
     <div class="pt"><span><i class="dot" style="background:${grp(p.group).color};border-radius:50%"></i>${esc(p.name)}</span><span class="hc">${hcText(p)}</span></div>
     <div class="pm">${p.rn===0?'Shares a room':`Needs ${need} ${need===1?'room':'rooms'}`}${p.from?` · ${esc(p.from)}`:''}${p.elder?' · elders':''}</div></div>`;
 }
@@ -1035,11 +1051,11 @@ function boardHTML(){
   const list = waiting.filter(p=>(UI.gf==='all' || p.group===UI.gf) && (!q || (p.name+' '+p.family+' '+p.from).toLowerCase().includes(q)))
     .sort((a,b)=>GROUPS.findIndex(g=>g.id===a.group)-GROUPS.findIndex(g=>g.id===b.group) || a.family.localeCompare(b.family) || a.ord-b.ord);
   const selName = UI.sel ? guest(UI.sel.id)?.name : '';
-  return `${legend()}
+  return `${legend(true)}
     <div class="board ${UI.sel?'placing':''}">
       <aside class="side">
         <header>
-          <div class="row" style="justify-content:space-between"><h2>Need a room</h2><span class="muted">${waiting.length} families</span></div>
+          <div class="row" style="justify-content:space-between"><h2>Need a room</h2><span class="muted">${list.length===waiting.length ? waiting.length : `${list.length} of ${waiting.length}`} families</span></div>
           <input id="q-board" class="field" type="search" placeholder="Search name, family or city" value="${esc(UI.q)}" data-k="q" aria-label="Search">
           <select id="gf-board" class="field" data-k="gf" aria-label="Filter by side"><option value="all">All sides</option>${GROUPS.map(g=>`<option value="${g.id}" ${UI.gf===g.id?'selected':''}>${esc(g.name)}</option>`).join('')}</select>
           <div class="row w"><button class="btn small primary" data-act="auto">${ic('wand')}Suggest rooms</button><button class="btn small" data-act="clear">Clear all rooms</button><button class="btn small" data-act="backups">${ic('clock')}Backups</button></div>
@@ -1050,7 +1066,7 @@ function boardHTML(){
         </div>
       </aside>
       <div class="mainb">
-        ${UI.sel?`<div class="placingbar"><span>${UI.sel.from?'Moving':'Placing'} <b>${esc(selName)}</b>. Pick a room.</span><button class="btn small" data-act="cancel-sel">Cancel</button></div>`:''}
+        ${UI.sel?`<div class="placingbar" role="status"><span>${UI.sel.from?'Moving':'Placing'} <b>${esc(selName)}</b>. Pick a room.</span><button class="btn small" data-act="cancel-sel">Cancel</button></div>`:''}
         ${S.zones.map(z=>{ const vs = S.villas.filter(v=>v.zone===z.id); return vs.length ? `<h2 class="zh">${esc(z.name)}<small>${esc(z.sub)}</small></h2>
           <div class="vgrid">${vs.map(v=>`
             <article class="vcard" id="vc-${v.id}">
@@ -1134,7 +1150,7 @@ function guestsHTML(){
     ${S.guests.length ? `<div class="tablewrap"><table class="gt"><colgroup>${[190,150,140,100,70,64,150,160,70,190,62,62,62,66,130,200,52].map(w=>`<col style="width:${w}px">`).join('')}</colgroup>
       <thead><tr>${COLS.map(th).join('')}${NIGHTS.map(n=>`<th class="c" title="${n.sub}">${n.label}</th>`).join('')}<th class="c">Elders</th><th>Phone</th><th>Note</th><th class="w"><span style="position:absolute;left:-9999px">Delete</span></th></tr></thead>
       <tbody>${list.map(g=>`<tr id="row-${g.id}" class="${UI.recent.includes(g.id)?'new':''}">
-        <td><input id="n-${g.id}" type="text" value="${esc(g.name)}" data-ge="name" data-id="${g.id}" aria-label="Name" ${d}></td>
+        <td><input id="n-${g.id}" type="text" value="${esc(g.name)}" title="${esc(g.name)}" data-ge="name" data-id="${g.id}" aria-label="Name" ${d}></td>
         <td><input id="h-${g.id}" type="text" value="${esc(g.family===g.name?'':g.family)}" placeholder="None" data-ge="family" data-id="${g.id}" list="famlist" aria-label="Family of ${esc(g.name)}" ${d}></td>
         <td><select id="g-${g.id}" data-ge="group" data-id="${g.id}" aria-label="Side of ${esc(g.name)}" ${d}>${GROUPS.map(x=>`<option value="${x.id}" ${g.group===x.id?'selected':''}>${esc(x.name)}</option>`).join('')}</select></td>
         <td><input id="rl-${g.id}" type="text" value="${esc(g.relation)}" data-ge="relation" data-id="${g.id}" aria-label="Relation of ${esc(g.name)}" style="min-width:80px;width:90px" ${d}></td>
@@ -1149,7 +1165,7 @@ function guestsHTML(){
         <td><input id="p-${g.id}" type="text" inputmode="tel" value="${esc(g.phone)}" data-ge="phone" data-id="${g.id}" placeholder="Add" aria-label="Phone of ${esc(g.name)}" ${d}></td>
         <td><input id="o-${g.id}" type="text" value="${esc(g.note)}" data-ge="note" data-id="${g.id}" placeholder="Add" aria-label="Note for ${esc(g.name)}" style="min-width:160px" ${d}></td>
         <td class="w"><button class="iconbtn" data-del="${g.id}" aria-label="Delete ${esc(g.name)}">${ic('trash')}</button></td>
-      </tr>`).join('') || `<tr><td colspan="${COLS.length+NIGHTS.length+4}" style="padding:22px;text-align:center;position:static" class="muted">No family matches these filters.</td></tr>`}</tbody>
+      </tr>`).join('') || `<tr><td colspan="${COLS.length+NIGHTS.length+4}" style="padding:0 12px;position:static" class="muted"><span class="emptyrow">No family matches these filters.</span></td></tr>`}</tbody>
       <tfoot><tr><td>${list.length} of ${S.guests.length} families</td><td colspan="3">${tot.ppl} people</td><td class="c">${tot.ad}</td><td class="c">${tot.kd}</td><td colspan="2"></td><td class="c">${tot.rn}</td><td>${tot.got} given</td><td colspan="${NIGHTS.length+4}"></td></tr></tfoot></table>
     </div>
     <p class="note">Click a column heading to sort. Rooms set to 0 means the family shares a room with others.</p>` : emptyState()}
@@ -1222,8 +1238,21 @@ async function listBackups(){
   if (UI.mode==='shared'){ const snap = await DB.collection('backups').get(); return snap.docs.map(d=>({id:d.id, ...d.data()})).sort((a,b)=>String(b.at).localeCompare(String(a.at))); }
   try{ return JSON.parse(localStorage.getItem(BK_LS) || '[]'); }catch(e){ return []; }
 }
+let FROM = null;
+function backFocus(){ const e = FROM && document.getElementById(FROM); FROM = null; if (e) e.focus({preventScroll:true}); }
+function closeSheet(){ UI.sheet = null; render(); const e = SHEET_FROM; SHEET_FROM = null; if (e && e.isConnected) e.focus(); }
+let SHEET_FROM = null;
+/* Before a bulk change, keep one automatic backup per kind of change. */
+function autoBackup(what){
+  if (!UI.canWrite || !S.guests.some(g=>g.rooms.length)) return;
+  const id = 'auto-' + what.toLowerCase().replace(/[^a-z]+/g, '-');
+  const doc = {name:'Auto: before ' + what, at:new Date().toISOString(), families:S.guests.length, placed:S.guests.filter(g=>g.rooms.length).length,
+    guests:Object.fromEntries(S.guests.map(g=>[g.id, gdoc(g)])), villas:Object.fromEntries(S.villas.map(v=>[v.id, vdoc(v)])), zones:S.zones.map(z=>({...z}))};
+  if (UI.mode==='shared') DB.doc('backups/' + id).set(doc).catch(()=>{});
+  else try{ const l = JSON.parse(localStorage.getItem(BK_LS) || '[]').filter(x=>x.id!==id); localStorage.setItem(BK_LS, JSON.stringify([{id, ...doc}, ...l])); }catch(e){}
+}
 async function openBackups(){
-  UI.sheet = 'backups'; UI.backups = null; render();
+  SHEET_FROM = document.activeElement; UI.sheet = 'backups'; UI.backups = null; render(); $('#bk-name')?.focus();
   try{ UI.backups = await listBackups(); }catch(e){ UI.backups = []; toast('Backups could not be loaded. Check your connection.'); }
   render();
 }
@@ -1330,8 +1359,8 @@ function addFamily(){
 function setTab(t){
   if (!['map','allot','guests','cards'].includes(t)) t = 'map';
   if (t === UI.tab) return;
-  const go = () => { UI.tab = t; UI.sel = null; UI.ms = null; FRESH = true; render(); FRESH = false; window.scrollTo({top:0}); };
-  if (document.startViewTransition && !matchMedia('(prefers-reduced-motion: reduce)').matches){ const vt = document.startViewTransition(go); [vt.ready, vt.finished, vt.updateCallbackDone].forEach(x=>x && x.catch(()=>{})); } else go();
+  const go = () => { UI.tab = t; UI.sel = null; UI.ms = null; UI.q = ''; FRESH = true; render(); FRESH = false; window.scrollTo({top:0}); };
+  if (t!=='guests' && document.startViewTransition && !matchMedia('(prefers-reduced-motion: reduce)').matches){ const vt = document.startViewTransition(go); [vt.ready, vt.finished, vt.updateCallbackDone].forEach(x=>x && x.catch(()=>{})); } else go();
 }
 
 /* ---- events ---- */
@@ -1344,7 +1373,7 @@ document.addEventListener('click', e=>{
   const t = e.target;
   if (t.closest('#modal') || t.closest('#toast')) return;
   if (UI.ms && !t.closest('.ms')){ UI.ms = null; render(); }
-  if (t.id==='sheet'){ UI.sheet = null; render(); return; }
+  if (t.id==='sheet'){ closeSheet(); return; }
   const tab = t.closest('[data-tab]'); if (tab){ location.hash = tab.dataset.tab; setTab(tab.dataset.tab); return; }
   const srt = t.closest('[data-sort]'); if (srt){ const k = srt.dataset.sort; UI.sort = UI.sort.key===k ? {key:k, dir:-UI.sort.dir} : {key:k, dir:1}; UI.recent = []; render(); return; }
   const stt = t.closest('[data-status]'); if (stt){ UI.status = stt.dataset.status; render(); return; }
@@ -1363,33 +1392,37 @@ document.addEventListener('click', e=>{
   const bkd = t.closest('[data-bk-del]'); if (bkd){ deleteBackup(bkd.dataset.bkDel); return; }
   const act = t.closest('[data-act]');
   if (act){ const a = act.dataset.act;
-    if (a==='close'){ UI.villa = null; render(); }
+    if (a==='close'){ UI.villa = null; render(); backFocus(); }
     if (a==='toggle-warns'){ UI.showWarns = !UI.showWarns; render(); }
-    if (a==='auto'){ checkpoint(); const left = autoAssign(); commit(); undoToast(left ? `Rooms suggested. ${left} families did not fit.` : 'Rooms suggested for everyone. Check them over.'); }
-    if (a==='clear'){ checkpoint(); S.guests.forEach(g=>g.rooms=[]); commit(); undoToast('All rooms cleared'); }
+    if (a==='auto'){ autoBackup('Suggest rooms'); checkpoint(); const left = autoAssign(); commit(); undoToast(left ? `Rooms suggested. ${left} families did not fit.` : 'Rooms suggested for everyone. Check them over.'); }
+    if (a==='clear'){ autoBackup('Clear all rooms'); checkpoint(); S.guests.forEach(g=>g.rooms=[]); commit(); undoToast('All rooms cleared'); }
     if (a==='cancel-sel'){ UI.sel = null; render(); }
     if (a==='reset-filters'){ UI.q = ''; UI.sf = 'all'; UI.status = 'all'; Object.values(UI.filters).forEach(s=>s.clear()); render(); const q = $('#q-guests'); if (q) q.value = ''; }
     if (a==='edit-layout'){ UI.layoutEdit = !UI.layoutEdit; UI.villa = null; render(); }
     if (a==='add-lane'){ S.zones.push({id:'z' + Date.now().toString(36), name:'New lane', sub:''}); commit(); const i = document.getElementById('zn-' + S.zones[S.zones.length-1].id); if (i){ i.focus(); i.select(); } }
     if (a==='backups') openBackups();
-    if (a==='close-sheet'){ UI.sheet = null; render(); }
+    if (a==='close-sheet') closeSheet();
     if (a==='template') templateCSV();
     if (a==='import-csv') $('#fileCsv').click();
     if (a==='export-csv') exportCSV();
     if (a==='save-cards') saveFile('villa-door-cards.html', printablePage());
     if (a==='print') window.print();
     return; }
-  const open = t.closest('[data-open]'); if (open && open.dataset.open){ UI.villa = open.dataset.open; render(); return; }
+  const open = t.closest('[data-open]'); if (open && open.dataset.open){ FROM = open.id || null; UI.villa = open.dataset.open; render(); $('#drawer [data-act=close]')?.focus({preventScroll:true}); return; }
   if (!UI.canWrite) return;
   const slotEl = t.closest('.slot[data-drop]'); if (slotEl && UI.sel && !t.closest('.chip')){ placeSelection(UI.sel, slotEl.dataset.drop); return; }
   const chip = t.closest('[data-g]'); if (chip && !t.closest('.stepper')){ const id = chip.dataset.g, from = chip.dataset.from || '';
     UI.sel = UI.sel && UI.sel.id===id && UI.sel.from===from ? null : {id, from}; render(); return; }
 });
 document.addEventListener('keydown', e=>{
+  if ((e.ctrlKey || e.metaKey) && !e.shiftKey && e.key.toLowerCase()==='z' && UNDO && !(e.target.matches && e.target.matches('input,textarea,select'))){ e.preventDefault(); undo(); return; }
+  if (e.key==='Tab' && UI.sheet && $('#modal').hidden){ const f = [...$('#sheetbox').querySelectorAll('button,input,select,[tabindex="0"]')].filter(x=>!x.disabled && x.offsetParent);
+    if (f.length){ const first = f[0], last = f[f.length-1]; if (!$('#sheetbox').contains(document.activeElement)){ e.preventDefault(); first.focus(); }
+      else if (e.shiftKey && document.activeElement===first){ e.preventDefault(); last.focus(); } else if (!e.shiftKey && document.activeElement===last){ e.preventDefault(); first.focus(); } } }
   if (e.key==='Escape' && $('#modal').hidden){
     if (UI.ms){ const k = UI.ms; UI.ms = null; render(); document.getElementById('msb-' + k)?.focus(); return; }
-    if (UI.sheet){ UI.sheet = null; render(); return; }
-    UI.sel = null; UI.villa = null; render(); return; }
+    if (UI.sheet){ closeSheet(); return; }
+    const had = UI.villa; UI.sel = null; UI.villa = null; render(); if (had) backFocus(); return; }
   if ((e.key==='Enter' || e.key===' ') && e.target.matches && e.target.matches('[role=button][tabindex="0"]')){ e.preventDefault(); e.target.click(); }
 });
 document.addEventListener('input', e=>{
@@ -1448,6 +1481,7 @@ window.addEventListener('hashchange', ()=>setTab(location.hash.slice(1)));
    ===================================================================== */
 function startLocal(note){ UI.mode = 'local'; UI.note = note || ''; UI.loaded = true; loadLocal(); rebuild(); FRESH = true; render(); FRESH = false; }
 async function boot(){
+  document.documentElement.lang = 'en';
   UI.tab = ['map','allot','guests','cards'].includes(location.hash.slice(1)) ? location.hash.slice(1) : 'map';
   rebuild(); render(); FRESH = false;
   if (!IN_VIEWER){ startLocal(); return; }
