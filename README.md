@@ -83,6 +83,29 @@ The villas are grouped into four suggested **lanes** around **the Chowk** (the l
   - **extra mattresses to request from the venue**
   - **headcount per night**, which the caterer also needs for breakfast counts
 
+### Guest list: sort, filter, find
+
+- **Sort** by clicking a column heading: name, family, side, relation, adults, kids, coming from, stay, rooms, or villa. Click again to reverse.
+- **Status tabs:** All families, Room not assigned, Room assigned, Guest count not added.
+- **Multi-select filters** for Side, Family and Coming from (tick as many as you like), plus a Stay filter.
+- The bottom row totals families, people, adults, kids and rooms for whatever is shown.
+
+### Editing the site map
+
+*Site map → Edit layout* turns the map into an editor:
+
+- **Move a villa to another lane** by dragging it, or with the lane menu on each villa (use the menu on phones). Guests stay in their rooms when a villa moves.
+- **Add a villa** to any lane, or **remove** an empty one.
+- **Rename a lane**, change its description, **add a lane**, or remove an empty one.
+
+### Backups of room assignments
+
+*Allot rooms → Backups* (also in the Guest list) saves a named snapshot of who is in which room, plus each room's beds, mattresses and holds. **Restore rooms** puts the rooms back that way and can be undone. Families and villa names are not changed by a restore.
+
+### Why it stays quick
+
+The page uses [morphdom](https://github.com/patrick-steele-idem/morphdom) (MIT, bundled in `index.html`) to update only the parts of the screen that changed. Typing, focus and scroll position survive every update, including updates from other people.
+
 ### Guests are families, with headcounts
 
 Each entry is one family (a party) with an **adult and kid counter**, the city it's **coming from**, where it **stays** (villa room, hotel, or own arrangement), and how many **rooms it needs**. Set rooms to 0 when a family shares a room with others ("adjust"). A family that needs 2 rooms is split evenly across them when the planner checks beds.
